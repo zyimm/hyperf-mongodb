@@ -1,0 +1,29 @@
+{
+  "name": "adamchen1208/hyperf-mongodb",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "adamchen1208",
+      "email": "adamchen1208@foxmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "psr/container": "^1.0",
+    "hyperf/pool": "~1.1.0",
+    "hyperf/contract": "~1.1.0",
+    "hyperf/utils": "~1.1.0"
+  },
+  "autoload": {
+    "classmap": [
+    ],
+    "psr-4": {
+      "Hyperf\\Mongodb\\": "src"
+    }
+  },
+  "extra": {
+    "hyperf": {
+      "config": "Hyperf\\Mongodb\\ConfigProvider"
+    }
+  }
+}
