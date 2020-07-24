@@ -25,7 +25,7 @@ use MongoDB\Driver\Query;
 use MongoDB\Driver\WriteConcern;
 use Psr\Container\ContainerInterface;
 
-class MongoDbConnection extends Connection implements ConnectionInterface
+class MongodbConnection extends Connection implements ConnectionInterface
 {
     /**
      * @var Manager
