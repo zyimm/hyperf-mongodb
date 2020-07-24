@@ -239,7 +239,7 @@ class Mongodb
         if ($hasContextConnection) {
             $connection = Context::get($this->getContextKey());
         }
-        if (!$connection instanceof MongoDbConnection) {
+        if (!$connection instanceof MongodbConnection) {
             $pool = $this->factory->getPool($this->poolName);
             $connection = $pool->get()->getConnection();
         }
