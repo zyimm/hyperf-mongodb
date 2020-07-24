@@ -13,10 +13,10 @@ use Hyperf\Mongodb\Pool\PoolFactory;
 use Hyperf\Utils\Context;
 
 /**
- * Class MongoDb
+ * Class Mongodb
  * @package Hyperf\Mongodb
  */
-class MongoDb
+class Mongodb
 {
     /**
      * @var PoolFactory
