@@ -10,7 +10,7 @@ namespace Hyperf\Mongodb\Pool;
 
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\ConnectionInterface;
-use Hyperf\Mongodb\MongoDbConnection;
+use Hyperf\Mongodb\MongodbConnection;
 use Hyperf\Pool\Pool;
 use Hyperf\Utils\Arr;
 use Psr\Container\ContainerInterface;
@@ -52,6 +52,6 @@ class MongoDBPool extends Pool
 
     protected function createConnection(): ConnectionInterface
     {
-        return new MongoDbConnection($this->container, $this, $this->config);
+        return new MongodbConnection($this->container, $this, $this->config);
     }
 }
