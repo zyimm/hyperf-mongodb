@@ -8,7 +8,7 @@
 
 namespace Hyperf\Mongodb;
 
-use Hyperf\Mongodb\MongoDb;
+use Hyperf\Mongodb\Mongodb;
 
 class ConfigProvider
 {
@@ -16,7 +16,7 @@ class ConfigProvider
     {
         return [
             'dependencies' => [
-                MongoDb::class => MongoDb::class,
+                Mongodb::class => Mongodb::class,
             ],
             'commands' => [
             ],
