@@ -40,77 +40,98 @@ return [
 # 使用案例
 
 使用注解，自动加载 
-**\Hyperf\Mongodb\MongoDb** 
+**\Hyperf\Mongodb\Mongodb** 
 ```php
 /**
  * @Inject()
- * @var MongoDb
+ * @var Mongodb
 */
- protected $mongoDbClient;
+ protected $mongodb;
 ```
 
 #### **tips:** 
 查询的值，是严格区分类型，string、int类型的哦
+
+### 查询一条数据
+
+```php
+$where = ['_id' => '1'];
+$result = $this->$mongodb->findOne('test', $where);
+```
+
+### 查询全部数据
+
+```php
+$where = ['_id' => '1'];
+$result = $this->$mongodb->findAll('test', $where);
+```
+
+### 查询一条数据（_id自动转对象）
+
+```php
+$where = ['_id' => '1'];
+$result = $this->$mongodb->fetchOne('test', $where);
+```
+
+### 查询全部数据（_id自动转对象）
+
+```php
+$where = ['_id' => '1'];
+$result = $this->$mongodb->fetchAll('test', $where);
+```
+
+### 分页查询
+```php
+$list = $this->$mongodb->fetchPagination('article', 10, 0, ['author' => $author]);
+```
 
 ### 新增
 
 单个添加
 ```php
 $insert = [
-            'account' => '',
+            '_id' => '',
             'password' => ''
 ];
-$this->$mongoDbClient->insert('fans',$insert);
+$this->$mongodb->insert('test',$insert);
 ```
 
 批量添加
 ```php
 $insert = [
             [
-                'account' => '',
+                '_id' => '',
                 'password' => ''
             ],
             [
-                'account' => '',
+                '_id' => '',
                 'password' => ''
             ]
 ];
-$this->$mongoDbClient->insertAll('fans',$insert);
-```
-
-### 查询
-
-```php
-$where = ['account'=>'1112313423'];
-$result = $this->$mongoDbClient->fetchAll('fans', $where);
-```
-
-### 分页查询
-```php
-$list = $this->$mongoDbClient->fetchPagination('article', 10, 0, ['author' => $author]);
+$this->$mongodb->insertAll('test',$insert);
 ```
 
 ### 更新
 ```php
-$where = ['account'=>'1112313423'];
+$where = ['_id'=>'1112313423'];
 $updateData = [];
 
-$this->$mongoDbClient->updateColumn('fans', $where,$updateData); // 只更新数据满足$where的行的列信息中在$newObject中出现过的字段
-$this->$mongoDbClient->updateRow('fans',$where,$updateData);// 更新数据满足$where的行的信息成$newObject
+$this->$mongodb->updateColumn('test', $where,$updateData); // 只更新数据满足$where的行的列信息中在$newObject中出现过的字段
+$this->$mongodb->updateRow('test',$where,$updateData);// 更新数据满足$where的行的信息成$newObject
 ```
 ### 删除
 
 ```php
-$where = ['account'=>'1112313423'];
+$where = ['_id'=>'1112313423'];
 $all = true; // 为false只删除匹配的一条，true删除多条
-$this->$mongoDbClient->delete('fans',$where,$all);
+$this->$mongodb->delete('test',$where,$all);
 ```
 
 ### count统计
 
 ```php
 $filter = ['isGroup' => "0", 'wechat' => '15584044700'];
-$count = $this->$mongoDbClient->count('fans', $filter);
+$count = $this->$mongodb->count('test', $filter);
 ```
 
 
@@ -150,5 +171,5 @@ $pipeline= [
             ]
 ];
 
-$count = $this->$mongoDbClient->command('fans', $pipeline);
+$count = $this->$mongodb->command('test', $pipeline);
 ```

@@ -113,7 +113,106 @@ class MongodbConnection extends Connection implements ConnectionInterface
 
 
     /**
+     * 查询返回结果的一条数据
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @param array $options
+     * @return array
+     * @throws MongoDBException
+     */
+    public function executeFindOne(string $namespace, array $filter = [], array $options = [])
+    {
+        // 查询数据
+        $result = [];
+        try {
+            $options['limit'] = 1;
+            $query = new Query($filter, $options);
+            $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
+            foreach ($cursor as $document) {
+                $result = (array)$document;
+                break;
+            }
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        } catch (Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        } finally {
+            $this->pool->release($this);
+            return $result;
+        }
+    }
+
+
+    /**
      * 查询返回结果的全部数据
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @param array $options
+     * @return array
+     * @throws MongoDBException
+     */
+    public function executeFindAll(string $namespace, array $filter = [], array $options = [])
+    {
+        // 查询数据
+        $result = [];
+        try {
+            $query = new Query($filter, $options);
+            $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
+            foreach ($cursor as $document) {
+                $result[] = (array)$document;
+            }
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        } catch (Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        } finally {
+            $this->pool->release($this);
+            return $result;
+        }
+    }
+
+
+    /**
+     * 查询返回结果的一条数据（_id自动转对象）
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @param array $options
+     * @return array
+     * @throws MongoDBException
+     */
+    public function executeQueryOne(string $namespace, array $filter = [], array $options = [])
+    {
+        if (!empty($filter['_id']) && !($filter['_id'] instanceof ObjectId)) {
+            $filter['_id'] = new ObjectId($filter['_id']);
+        }
+        // 查询数据
+        $result = [];
+        try {
+            $options['limit'] = 1;
+            $query = new Query($filter, $options);
+            $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
+            foreach ($cursor as $document) {
+                $document = (array)$document;
+                $document['_id'] = (string)$document['_id'];
+                $result = $document;
+                break;
+            }
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        } catch (Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        } finally {
+            $this->pool->release($this);
+            return $result;
+        }
+    }
+
+
+    /**
+     * 查询返回结果的全部数据（_id自动转对象）
      *
      * @param string $namespace
      * @param array $filter
@@ -131,7 +230,6 @@ class MongodbConnection extends Connection implements ConnectionInterface
         try {
             $query = new Query($filter, $options);
             $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
-
             foreach ($cursor as $document) {
                 $document = (array)$document;
                 $document['_id'] = (string)$document['_id'];
@@ -146,6 +244,15 @@ class MongodbConnection extends Connection implements ConnectionInterface
             return $result;
         }
     }
+
+
+
+
+
+
+
+
+
 
     /**
      * 返回分页数据，默认每页10条
@@ -492,68 +599,5 @@ class MongodbConnection extends Connection implements ConnectionInterface
         }
     }
 
-    /**
-     * 查询返回结果的全部数据
-     *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $options
-     * @return array
-     * @throws MongoDBException
-     */
-    public function executeFindAll(string $namespace, array $filter = [], array $options = [])
-    {
-        // 查询数据
-        $result = [];
-        try {
-            $query = new Query($filter, $options);
-            $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
 
-            foreach ($cursor as $document) {
-                $document = (array)$document;
-                $document['_id'] = (string)$document['_id'];
-                $result[] = $document;
-            }
-        } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
-        } catch (Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
-        } finally {
-            $this->pool->release($this);
-            return $result;
-        }
-    }
-
-    /**
-     * 查询返回结果的全部数据
-     *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $options
-     * @return array
-     * @throws MongoDBException
-     */
-    public function executeFindOne(string $namespace, array $filter = [], array $options = [])
-    {
-        // 查询数据
-        $result = [];
-        try {
-            $query = new Query($filter, $options);
-            $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
-
-            foreach ($cursor as $document) {
-                $document = (array)$document;
-                $document['_id'] = (string)$document['_id'];
-                $result = $document;
-                break;
-            }
-        } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
-        } catch (Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
-        } finally {
-            $this->pool->release($this);
-            return $result;
-        }
-    }
 }

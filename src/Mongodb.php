@@ -23,18 +23,114 @@ class Mongodb
      */
     protected $factory;
 
+
     /**
      * @var string
      */
     protected $poolName = 'default';
+
 
     public function __construct(PoolFactory $factory)
     {
         $this->factory = $factory;
     }
 
+
+    /**
+     * The key to identify the connection object in coroutine context.
+     */
+    private function getContextKey(): string
+    {
+        return sprintf('mongodb.connection.%s', $this->poolName);
+    }
+
+
+    private function getConnection()
+    {
+        $connection = null;
+        $hasContextConnection = Context::has($this->getContextKey());
+        if ($hasContextConnection) {
+            $connection = Context::get($this->getContextKey());
+        }
+        if (!$connection instanceof MongodbConnection) {
+            $pool = $this->factory->getPool($this->poolName);
+            $connection = $pool->get()->getConnection();
+        }
+        return $connection;
+    }
+
+
+    /**
+     * 返回满足filer的一条数据
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @param array $options
+     * @return array
+     * @throws MongoDBException
+     */
+    public function findOne(string $namespace, array $filter = [], array $options = []): array
+    {
+        try {
+            /**
+             * @var $collection MongoDBConnection
+             */
+            $collection = $this->getConnection();
+            return $collection->executeFindOne($namespace, $filter, $options);
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        }
+    }
+
+
     /**
      * 返回满足filer的全部数据
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @param array $options
+     * @return array
+     * @throws MongoDBException
+     */
+    public function findAll(string $namespace, array $filter = [], array $options = []): array
+    {
+        try {
+            /**
+             * @var $collection MongoDBConnection
+             */
+            $collection = $this->getConnection();
+            return $collection->executeFindAll($namespace, $filter, $options);
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        }
+    }
+
+
+    /**
+     * 返回满足filer的一条数据（_id为自动转对象）
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @param array $options
+     * @return array
+     * @throws MongoDBException
+     */
+    public function fetchOne(string $namespace, array $filter = [], array $options = []): array
+    {
+        try {
+            /**
+             * @var $collection MongoDBConnection
+             */
+            $collection = $this->getConnection();
+            return $collection->executeQueryOne($namespace, $filter, $options);
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        }
+    }
+
+
+    /**
+     * 返回满足filer的全部数据（_id自动转对象）
      *
      * @param string $namespace
      * @param array $filter
@@ -54,6 +150,12 @@ class Mongodb
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
+
+
+
+
+
+
 
     /**
      * 返回满足filer的分页数据
@@ -232,70 +334,7 @@ class Mongodb
         }
     }
 
-    private function getConnection()
-    {
-        $connection = null;
-        $hasContextConnection = Context::has($this->getContextKey());
-        if ($hasContextConnection) {
-            $connection = Context::get($this->getContextKey());
-        }
-        if (!$connection instanceof MongodbConnection) {
-            $pool = $this->factory->getPool($this->poolName);
-            $connection = $pool->get()->getConnection();
-        }
-        return $connection;
-    }
-
-    /**
-     * The key to identify the connection object in coroutine context.
-     */
-    private function getContextKey(): string
-    {
-        return sprintf('mongodb.connection.%s', $this->poolName);
-    }
-
-    /**
-     * 返回满足filer的全部数据
-     *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $options
-     * @return array
-     * @throws MongoDBException
-     */
-    public function findAll(string $namespace, array $filter = [], array $options = []): array
-    {
-        try {
-            /**
-             * @var $collection MongoDBConnection
-             */
-            $collection = $this->getConnection();
-            return $collection->executeFindAll($namespace, $filter, $options);
-        } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
-        }
-    }
 
 
-    /**
-     * 返回满足filer的全部数据
-     *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $options
-     * @return array
-     * @throws MongoDBException
-     */
-    public function findOne(string $namespace, array $filter = [], array $options = []): array
-    {
-        try {
-            /**
-             * @var $collection MongoDBConnection
-             */
-            $collection = $this->getConnection();
-            return $collection->executeFindOne($namespace, $filter, $options);
-        } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
-        }
-    }
+
 }
