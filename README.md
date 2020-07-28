@@ -1,7 +1,7 @@
 # hyperf-mongodb
 
 #### 介绍
-基于hyperf的mongodb连接池组件，暂不支持协程。基于composer项目yumufeng/hyperf-mongodb和项目mongodb/mongodb做了个性化的优化。
+用于hyperf的mongodb连接池组件，暂不支持协程。基于composer项目yumufeng/hyperf-mongodb和项目mongodb/mongodb做了个性化的优化。
 
 
 # hyperf mongodb pool
