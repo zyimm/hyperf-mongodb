@@ -23,18 +23,15 @@ class Mongodb
      */
     protected $factory;
 
-
     /**
      * @var string
      */
     protected $poolName = 'default';
 
-
     public function __construct(PoolFactory $factory)
     {
         $this->factory = $factory;
     }
-
 
     /**
      * The key to identify the connection object in coroutine context.
@@ -43,7 +40,6 @@ class Mongodb
     {
         return sprintf('mongodb.connection.%s', $this->poolName);
     }
-
 
     private function getConnection()
     {
@@ -59,7 +55,6 @@ class Mongodb
         return $connection;
     }
 
-
     /**
      * 返回满足filer的一条数据
      *
@@ -73,7 +68,7 @@ class Mongodb
     {
         try {
             /**
-             * @var $collection MongoDBConnection
+             * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
             return $collection->executeFindOne($namespace, $filter, $options);
@@ -81,7 +76,6 @@ class Mongodb
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
-
 
     /**
      * 返回满足filer的全部数据
@@ -96,7 +90,7 @@ class Mongodb
     {
         try {
             /**
-             * @var $collection MongoDBConnection
+             * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
             return $collection->executeFindAll($namespace, $filter, $options);
@@ -105,6 +99,29 @@ class Mongodb
         }
     }
 
+    /**
+     * 返回满足filer的分页数据
+     *
+     * @param string $namespace
+     * @param int $limit
+     * @param int $currentPage
+     * @param array $filter
+     * @param array $options
+     * @return array
+     * @throws MongoDBException
+     */
+    public function findPagination(string $namespace, int $limit, int $currentPage, array $filter = [], array $options = []): array
+    {
+        try {
+            /**
+             * @var $collection MongodbConnection
+             */
+            $collection = $this->getConnection();
+            return $collection->execFindPagination($namespace, $limit, $currentPage, $filter, $options);
+        } catch (\Exception  $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        }
+    }
 
     /**
      * 返回满足filer的一条数据（_id为自动转对象）
@@ -119,15 +136,14 @@ class Mongodb
     {
         try {
             /**
-             * @var $collection MongoDBConnection
+             * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->executeQueryOne($namespace, $filter, $options);
+            return $collection->executeFetchOne($namespace, $filter, $options);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
-
 
     /**
      * 返回满足filer的全部数据（_id自动转对象）
@@ -142,10 +158,10 @@ class Mongodb
     {
         try {
             /**
-             * @var $collection MongoDBConnection
+             * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->executeQueryAll($namespace, $filter, $options);
+            return $collection->executeFetchAll($namespace, $filter, $options);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
@@ -153,12 +169,8 @@ class Mongodb
 
 
 
-
-
-
-
     /**
-     * 返回满足filer的分页数据
+     * 返回满足filer的分页数据（_id自动转对象）
      *
      * @param string $namespace
      * @param int $limit
@@ -172,17 +184,38 @@ class Mongodb
     {
         try {
             /**
-             * @var $collection MongoDBConnection
+             * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->execQueryPagination($namespace, $limit, $currentPage, $filter, $options);
+            return $collection->execFetchPagination($namespace, $limit, $currentPage, $filter, $options);
         } catch (\Exception  $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
 
     /**
-     * 批量插入
+     * 插入一条数据
+     *
+     * @param $namespace
+     * @param array $data
+     * @return bool|mixed
+     * @throws MongoDBException
+     */
+    public function insertOne($namespace, array $data = [])
+    {
+        try {
+            /**
+             * @var $collection MongodbConnection
+             */
+            $collection = $this->getConnection();
+            return $collection->execInsertOne($namespace, $data);
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        }
+    }
+
+    /**
+     * 插入批量数据
      * @param $namespace
      * @param array $data
      * @return bool|string
@@ -195,32 +228,11 @@ class Mongodb
         }
         try {
             /**
-             * @var $collection MongoDBConnection
+             * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->insertAll($namespace, $data);
+            return $collection->execInsertAll($namespace, $data);
         } catch (MongoDBException $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
-        }
-    }
-
-    /**
-     * 数据插入数据库
-     *
-     * @param $namespace
-     * @param array $data
-     * @return bool|mixed
-     * @throws MongoDBException
-     */
-    public function insert($namespace, array $data = [])
-    {
-        try {
-            /**
-             * @var $collection MongoDBConnection
-             */
-            $collection = $this->getConnection();
-            return $collection->insert($namespace, $data);
-        } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -238,10 +250,10 @@ class Mongodb
     {
         try {
             /**
-             * @var $collection MongoDBConnection
+             * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->updateRow($namespace, $filter, $newObj);
+            return $collection->execUpdateRow($namespace, $filter, $newObj);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
@@ -260,10 +272,10 @@ class Mongodb
     {
         try {
             /**
-             * @var $collection MongoDBConnection
+             * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->updateColumn($namespace, $filter, $newObj);
+            return $collection->execUpdateColumn($namespace, $filter, $newObj);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
@@ -282,10 +294,10 @@ class Mongodb
     {
         try {
             /**
-             * @var $collection MongoDBConnection
+             * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->delete($namespace, $filter, $limit);
+            return $collection->execDelete($namespace, $filter, $limit);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
@@ -303,15 +315,14 @@ class Mongodb
     {
         try {
             /**
-             * @var $collection MongoDBConnection
+             * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->count($namespace, $filter);
+            return $collection->execCount($namespace, $filter);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
-
 
     /**
      * 聚合查询
@@ -325,16 +336,12 @@ class Mongodb
     {
         try {
             /**
-             * @var $collection MongoDBConnection
+             * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->command($namespace, $filter);
+            return $collection->execCommand($namespace, $filter);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
-
-
-
-
 }

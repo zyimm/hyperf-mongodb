@@ -66,6 +66,11 @@ $where = ['_id' => '1'];
 $result = $this->$mongodb->findAll('test', $where);
 ```
 
+### 分页查询
+```php
+$list = $this->$mongodb->findPagination('article', 10, 0, ['author' => $author]);
+```
+
 ### 查询一条数据（_id自动转对象）
 
 ```php
@@ -80,14 +85,12 @@ $where = ['_id' => '1'];
 $result = $this->$mongodb->fetchAll('test', $where);
 ```
 
-### 分页查询
+### 分页查询（_id自动转对象）
 ```php
 $list = $this->$mongodb->fetchPagination('article', 10, 0, ['author' => $author]);
 ```
 
-### 新增
-
-单个添加
+### 插入一条数据
 ```php
 $insert = [
             '_id' => '',
@@ -96,7 +99,7 @@ $insert = [
 $this->$mongodb->insert('test',$insert);
 ```
 
-批量添加
+### 插入批量数据
 ```php
 $insert = [
             [
@@ -120,24 +123,19 @@ $this->$mongodb->updateColumn('test', $where,$updateData); // 只更新数据满
 $this->$mongodb->updateRow('test',$where,$updateData);// 更新数据满足$where的行的信息成$newObject
 ```
 ### 删除
-
 ```php
 $where = ['_id'=>'1112313423'];
 $all = true; // 为false只删除匹配的一条，true删除多条
 $this->$mongodb->delete('test',$where,$all);
 ```
 
-### count统计
-
+### 统计
 ```php
 $filter = ['isGroup' => "0", 'wechat' => '15584044700'];
 $count = $this->$mongodb->count('test', $filter);
 ```
 
-
-
-### Command，执行更复杂的mongo命令
-
+### 聚合查询
 **sql** 和 **mongodb** 关系对比图
 
 |   SQL  | MongoDb |
