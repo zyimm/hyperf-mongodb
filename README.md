@@ -75,19 +75,19 @@ $list = $this->$mongodb->findPagination('article', 10, 0, ['author' => $author])
 
 ```php
 $where = ['_id' => '1'];
-$result = $this->$mongodb->fetchOne('test', $where);
+$result = $this->$mongodb->findOneId('test', $where);
 ```
 
 ### 查询全部数据（_id自动转对象）
 
 ```php
 $where = ['_id' => '1'];
-$result = $this->$mongodb->fetchAll('test', $where);
+$result = $this->$mongodb->findAllId('test', $where);
 ```
 
 ### 分页查询（_id自动转对象）
 ```php
-$list = $this->$mongodb->fetchPagination('article', 10, 0, ['author' => $author]);
+$list = $this->$mongodb->findPaginationId('article', 10, 0, ['author' => $author]);
 ```
 
 ### 插入一条数据
@@ -122,11 +122,35 @@ $updateData = [];
 $this->$mongodb->updateColumn('test', $where,$updateData); // 只更新数据满足$where的行的列信息中在$newObject中出现过的字段
 $this->$mongodb->updateRow('test',$where,$updateData);// 更新数据满足$where的行的信息成$newObject
 ```
+
+### 更新（_id自动转对象）
+```php
+$where = ['_id'=>'1112313423'];
+$updateData = [];
+
+$this->$mongodb->updateColumnId('test', $where,$updateData); // 只更新数据满足$where的行的列信息中在$newObject中出现过的字段
+$this->$mongodb->updateRowId('test',$where,$updateData);// 更新数据满足$where的行的信息成$newObject
+```
+
 ### 删除
 ```php
 $where = ['_id'=>'1112313423'];
 $all = true; // 为false只删除匹配的一条，true删除多条
-$this->$mongodb->delete('test',$where,$all);
+$this->$mongodb->deleteOne('test',$where,$all);
+```
+
+### 批量删除
+```php
+$where = ['_id'=>'1112313423'];
+$all = true; // 为false只删除匹配的一条，true删除多条
+$this->$mongodb->deleteMany('test',$where,$all);
+```
+
+### 删除（_id自动转对象）
+```php
+$where = ['_id'=>'1112313423'];
+$all = true; // 为false只删除匹配的一条，true删除多条
+$this->$mongodb->deleteOneId('test',$where,$all);
 ```
 
 ### 统计

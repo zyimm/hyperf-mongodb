@@ -181,7 +181,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * @return array
      * @throws MongoDBException
      */
-    public function executeFindOne(string $namespace, array $filter = [], array $options = [])
+    public function execFindOne(string $namespace, array $filter = [], array $options = [])
     {
         // 查询数据
         $result = [];
@@ -212,7 +212,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * @return array
      * @throws MongoDBException
      */
-    public function executeFindAll(string $namespace, array $filter = [], array $options = [])
+    public function execFindAll(string $namespace, array $filter = [], array $options = [])
     {
         // 查询数据
         $result = [];
@@ -286,7 +286,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * @return array
      * @throws MongoDBException
      */
-    public function executeFetchOne(string $namespace, array $filter = [], array $options = [])
+    public function execFindOneId(string $namespace, array $filter = [], array $options = [])
     {
         if (!empty($filter['_id']) && !($filter['_id'] instanceof ObjectId)) {
             $filter['_id'] = new ObjectId($filter['_id']);
@@ -322,7 +322,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * @return array
      * @throws MongoDBException
      */
-    public function executeFetchAll(string $namespace, array $filter = [], array $options = [])
+    public function execFindAllId(string $namespace, array $filter = [], array $options = [])
     {
         if (!empty($filter['_id']) && !($filter['_id'] instanceof ObjectId)) {
             $filter['_id'] = new ObjectId($filter['_id']);
@@ -358,7 +358,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * @return array
      * @throws MongoDBException
      */
-    public function execFetchPagination(string $namespace, int $limit = 10, int $currentPage = 0, array $filter = [], array $options = [])
+    public function execFindPaginationId(string $namespace, int $limit = 10, int $currentPage = 0, array $filter = [], array $options = [])
     {
         if (!empty($filter['_id']) && !($filter['_id'] instanceof ObjectId)) {
             $filter['_id'] = new ObjectId($filter['_id']);
@@ -437,7 +437,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * @return bool|string
      * @throws MongoDBException
      */
-    public function execInsertAll(string $namespace, array $data = [])
+    public function execInsertMany(string $namespace, array $data = [])
     {
         try {
             $bulk = new BulkWrite();
@@ -473,9 +473,6 @@ class MongodbConnection extends Connection implements ConnectionInterface
     public function execUpdateRow(string $namespace, array $filter = [], array $newObj = []): bool
     {
         try {
-            if (!empty($filter['_id']) && !($filter['_id'] instanceof ObjectId)) {
-                $filter['_id'] = new ObjectId($filter['_id']);
-            }
             $bulk = new BulkWrite;
             $bulk->update(
                 $filter,
@@ -513,6 +510,83 @@ class MongodbConnection extends Connection implements ConnectionInterface
     public function execUpdateColumn(string $namespace, array $filter = [], array $newObj = []): bool
     {
         try {
+            $bulk = new BulkWrite;
+            $bulk->update(
+                $filter,
+                ['$set' => $newObj],
+                ['multi' => false, 'upsert' => false]
+            );
+            $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
+            $result = $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $modifiedCount = $result->getModifiedCount();
+            $update = $modifiedCount == 1 ? true : false;
+        } catch (\Exception $e) {
+            $update = false;
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        } finally {
+            $this->release();
+            return $update;
+        }
+    }
+
+    /**
+     * 数据更新,效果是满足filter的行,只更新$newObj中的$set出现的字段（_id自动转对象）
+     * http://php.net/manual/zh/mongodb-driver-bulkwrite.update.php
+     * $bulk->update(
+     *   ['x' => 2],
+     *   ['$set' => ['y' => 3]],
+     *   ['multi' => false, 'upsert' => false]
+     * );
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @param array $newObj
+     * @return bool
+     * @throws MongoDBException
+     */
+    public function execUpdateRowId(string $namespace, array $filter = [], array $newObj = []): bool
+    {
+        try {
+            if (!empty($filter['_id']) && !($filter['_id'] instanceof ObjectId)) {
+                $filter['_id'] = new ObjectId($filter['_id']);
+            }
+            $bulk = new BulkWrite;
+            $bulk->update(
+                $filter,
+                ['$set' => $newObj],
+                ['multi' => true, 'upsert' => false]
+            );
+            $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
+            $result = $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $modifiedCount = $result->getModifiedCount();
+            $update = $modifiedCount == 0 ? false : true;
+        } catch (\Exception $e) {
+            $update = false;
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        } finally {
+            $this->pool->release($this);
+            return $update;
+        }
+    }
+
+    /**
+     * 数据更新, 效果是满足filter的行数据更新成$newObj（_id自动转对象）
+     * http://php.net/manual/zh/mongodb-driver-bulkwrite.update.php
+     * $bulk->update(
+     *   ['x' => 2],
+     *   [['y' => 3]],
+     *   ['multi' => false, 'upsert' => false]
+     * );
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @param array $newObj
+     * @return bool
+     * @throws MongoDBException
+     */
+    public function execUpdateColumnId(string $namespace, array $filter = [], array $newObj = []): bool
+    {
+        try {
             if (!empty($filter['_id']) && !($filter['_id'] instanceof ObjectId)) {
                 $filter['_id'] = new ObjectId($filter['_id']);
             }
@@ -536,22 +610,71 @@ class MongodbConnection extends Connection implements ConnectionInterface
     }
 
     /**
-     * 删除数据
+     * 删除一条数据
      *
      * @param string $namespace
      * @param array $filter
-     * @param bool $limit
      * @return bool
      * @throws MongoDBException
      */
-    public function execDelete(string $namespace, array $filter = [], bool $limit = false): bool
+    public function execDeleteOne(string $namespace, array $filter = []): bool
+    {
+        try {
+            $bulk = new BulkWrite;
+            $bulk->delete($filter, ['limit' => 1]);
+            $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
+            $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $delete = true;
+        } catch (\Exception $e) {
+            $delete = false;
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        } finally {
+            $this->pool->release($this);
+            return $delete;
+        }
+    }
+
+    /**
+     * 删除多条数据
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @return bool
+     * @throws MongoDBException
+     */
+    public function execDeleteMany(string $namespace, array $filter = []): bool
+    {
+        try {
+            $bulk = new BulkWrite;
+            $bulk->delete($filter, ['limit' => false]);
+            $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
+            $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $delete = true;
+        } catch (\Exception $e) {
+            $delete = false;
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        } finally {
+            $this->pool->release($this);
+            return $delete;
+        }
+    }
+
+    /**
+     * 删除一条数据（_id自动转对象）
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @return bool
+     * @throws MongoDBException
+     */
+    public function execDeleteOneId(string $namespace, array $filter = []): bool
     {
         try {
             if (!empty($filter['_id']) && !($filter['_id'] instanceof ObjectId)) {
                 $filter['_id'] = new ObjectId($filter['_id']);
             }
             $bulk = new BulkWrite;
-            $bulk->delete($filter, ['limit' => $limit]);
+            $bulk->delete($filter, ['limit' => 1]);
             $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
             $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
             $delete = true;

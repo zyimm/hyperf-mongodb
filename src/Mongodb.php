@@ -71,7 +71,7 @@ class Mongodb
              * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->executeFindOne($namespace, $filter, $options);
+            return $collection->execFindOne($namespace, $filter, $options);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
@@ -93,7 +93,7 @@ class Mongodb
              * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->executeFindAll($namespace, $filter, $options);
+            return $collection->execFindAll($namespace, $filter, $options);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
@@ -132,14 +132,14 @@ class Mongodb
      * @return array
      * @throws MongoDBException
      */
-    public function fetchOne(string $namespace, array $filter = [], array $options = []): array
+    public function findOneId(string $namespace, array $filter = [], array $options = []): array
     {
         try {
             /**
              * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->executeFetchOne($namespace, $filter, $options);
+            return $collection->execFindOneId($namespace, $filter, $options);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
@@ -154,14 +154,14 @@ class Mongodb
      * @return array
      * @throws MongoDBException
      */
-    public function fetchAll(string $namespace, array $filter = [], array $options = []): array
+    public function fetchAllId(string $namespace, array $filter = [], array $options = []): array
     {
         try {
             /**
              * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->executeFetchAll($namespace, $filter, $options);
+            return $collection->execFindAllId($namespace, $filter, $options);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
@@ -178,14 +178,14 @@ class Mongodb
      * @return array
      * @throws MongoDBException
      */
-    public function fetchPagination(string $namespace, int $limit, int $currentPage, array $filter = [], array $options = []): array
+    public function findPaginationId(string $namespace, int $limit, int $currentPage, array $filter = [], array $options = []): array
     {
         try {
             /**
              * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->execFetchPagination($namespace, $limit, $currentPage, $filter, $options);
+            return $collection->execFindPaginationId($namespace, $limit, $currentPage, $filter, $options);
         } catch (\Exception  $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
@@ -219,7 +219,7 @@ class Mongodb
      * @return bool|string
      * @throws MongoDBException
      */
-    public function insertAll($namespace, array $data)
+    public function insertMany($namespace, array $data)
     {
         if (count($data) == count($data, 1)) {
             throw new  MongoDBException('data is can only be a two-dimensional array');
@@ -229,7 +229,7 @@ class Mongodb
              * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->execInsertAll($namespace, $data);
+            return $collection->execInsertMany($namespace, $data);
         } catch (MongoDBException $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
@@ -280,22 +280,107 @@ class Mongodb
     }
 
     /**
-     * 删除满足条件的数据，默认只删除匹配条件的第一条记录，如果要删除多条$limit=true
+     * 更新数据满足$filter的行的信息成$newObject（_id自动转对象）
      *
-     * @param string $namespace
+     * @param $namespace
      * @param array $filter
-     * @param bool $limit
+     * @param array $newObj
      * @return bool
      * @throws MongoDBException
      */
-    public function delete(string $namespace, array $filter = [], bool $limit = false): bool
+    public function updateRowId($namespace, array $filter = [], array $newObj = []): bool
     {
         try {
             /**
              * @var $collection MongodbConnection
              */
             $collection = $this->getConnection();
-            return $collection->execDelete($namespace, $filter, $limit);
+            return $collection->execUpdateRowId($namespace, $filter, $newObj);
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        }
+    }
+
+    /**
+     * 只更新数据满足$filter的行的列信息中在$newObject中出现过的字段（_id自动转对象）
+     *
+     * @param $namespace
+     * @param array $filter
+     * @param array $newObj
+     * @return bool
+     * @throws MongoDBException
+     */
+    public function updateColumnId($namespace, array $filter = [], array $newObj = []): bool
+    {
+        try {
+            /**
+             * @var $collection MongodbConnection
+             */
+            $collection = $this->getConnection();
+            return $collection->execUpdateColumnId($namespace, $filter, $newObj);
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        }
+    }
+
+    /**
+     * 删除满足条件的数据，默认只删除匹配条件的第一条记录，如果要删除多条$limit=true
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @return bool
+     * @throws MongoDBException
+     */
+    public function deleteOne(string $namespace, array $filter = []): bool
+    {
+        try {
+            /**
+             * @var $collection MongodbConnection
+             */
+            $collection = $this->getConnection();
+            return $collection->execDeleteOne($namespace, $filter);
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        }
+    }
+
+    /**
+     * 删除满足条件的数据，默认只删除匹配条件的第一条记录，如果要删除多条$limit=true
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @return bool
+     * @throws MongoDBException
+     */
+    public function deleteMany(string $namespace, array $filter = []): bool
+    {
+        try {
+            /**
+             * @var $collection MongodbConnection
+             */
+            $collection = $this->getConnection();
+            return $collection->execDeleteMany($namespace, $filter);
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+        }
+    }
+
+    /**
+     * 删除满足条件的数据，默认只删除匹配条件的第一条记录，如果要删除多条$limit=true（_id自动转对象）
+     *
+     * @param string $namespace
+     * @param array $filter
+     * @return bool
+     * @throws MongoDBException
+     */
+    public function deleteOneId(string $namespace, array $filter = []): bool
+    {
+        try {
+            /**
+             * @var $collection MongodbConnection
+             */
+            $collection = $this->getConnection();
+            return $collection->execDeleteOneId($namespace, $filter);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
