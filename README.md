@@ -7,7 +7,7 @@
 # hyperf mongodb pool
 
 ```
-composer require adamchen1208/hyperf-mongodb
+composer require zyimm/hyperf-mongodb
 ```
 
 ## config 
