@@ -1,17 +1,17 @@
 {
-  "name": "adamchen1208/hyperf-mongodb",
+  "name": "zyimm/hyperf-mongodb",
   "license": "MIT",
   "authors": [
     {
-      "name": "adamchen1208",
-      "email": "adamchen1208@foxmail.com"
+      "name": "zyimm",
+      "email": "zyimm@qq.com"
     }
   ],
   "require": {
     "php": ">=7.2",
     "psr/container": "^1.0",
     "hyperf/pool": "^2.0",
-    "hyperf/utils": "~2.0.0"
+    "hyperf/utils": "^2.0.0"
   },
   "autoload": {
     "classmap": [
