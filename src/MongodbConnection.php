@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: adamchen1208
- * Date: 2020/7/24
- * Time: 15:31
- */
-
 namespace Hyperf\Mongodb;
 
 use Hyperf\Contract\ConnectionInterface;
@@ -94,9 +87,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
             }
             $this->connection = new Manager($uri, $urlOptions);
         } catch (InvalidArgumentException $e) {
-            throw MongoDBException::managerError('mongodb 连接参数错误:' . $e->getMessage());
+            throw MongoDBException::managerError('mongodb 连接参数错误:'.$e->getMessage());
         } catch (RuntimeException $e) {
-            throw MongoDBException::managerError('mongodb uri格式错误:' . $e->getMessage());
+            throw MongoDBException::managerError('mongodb uri格式错误:'.$e->getMessage());
         }
         $this->lastUseTime = microtime(true);
         return true;
@@ -130,7 +123,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
     }
 
     /**
-     * @param \Throwable $e
+     * @param  \Throwable  $e
      * @return bool
      * @throws MongoDBException
      */
@@ -138,46 +131,46 @@ class MongodbConnection extends Connection implements ConnectionInterface
     {
         switch ($e) {
             case ($e instanceof InvalidArgumentException):
-                {
-                    throw MongoDBException::managerError('mongo argument exception: ' . $e->getMessage());
-                }
+            {
+                throw MongoDBException::managerError('mongo argument exception: '.$e->getMessage());
+            }
             case ($e instanceof AuthenticationException):
-                {
-                    throw MongoDBException::managerError('mongo数据库连接授权失败:' . $e->getMessage());
-                }
+            {
+                throw MongoDBException::managerError('mongo数据库连接授权失败:'.$e->getMessage());
+            }
             case ($e instanceof ConnectionException):
-                {
-                    /**
-                     * https://cloud.tencent.com/document/product/240/4980
-                     * 存在连接失败的，那么进行重连
-                     */
-                    for ($counts = 1; $counts <= 5; $counts++) {
-                        try {
-                            $this->reconnect();
-                        } catch (\Exception $e) {
-                            continue;
-                        }
-                        break;
+            {
+                /**
+                 * https://cloud.tencent.com/document/product/240/4980
+                 * 存在连接失败的，那么进行重连
+                 */
+                for ($counts = 1; $counts <= 5; $counts++) {
+                    try {
+                        $this->reconnect();
+                    } catch (\Exception $e) {
+                        continue;
                     }
-                    return true;
+                    break;
                 }
+                return true;
+            }
             case ($e instanceof RuntimeException):
-                {
-                    throw MongoDBException::managerError('mongo runtime exception: ' . $e->getMessage());
-                }
+            {
+                throw MongoDBException::managerError('mongo runtime exception: '.$e->getMessage());
+            }
             default:
-                {
-                    throw MongoDBException::managerError('mongo unexpected exception: ' . $e->getMessage());
-                }
+            {
+                throw MongoDBException::managerError('mongo unexpected exception: '.$e->getMessage());
+            }
         }
     }
 
     /**
      * 查询返回结果的一条数据
      *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $options
+     * @param  string  $namespace
+     * @param  array  $filter
+     * @param  array  $options
      * @return array
      * @throws MongoDBException
      */
@@ -187,16 +180,16 @@ class MongodbConnection extends Connection implements ConnectionInterface
         $result = [];
         try {
             $options['limit'] = 1;
-            $query = new Query($filter, $options);
-            $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
+            $query            = new Query($filter, $options);
+            $cursor           = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
             foreach ($cursor as $document) {
-                $result = (array)$document;
+                $result = (array) $document;
                 break;
             }
         } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $result;
@@ -206,9 +199,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 查询返回结果的全部数据
      *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $options
+     * @param  string  $namespace
+     * @param  array  $filter
+     * @param  array  $options
      * @return array
      * @throws MongoDBException
      */
@@ -217,15 +210,15 @@ class MongodbConnection extends Connection implements ConnectionInterface
         // 查询数据
         $result = [];
         try {
-            $query = new Query($filter, $options);
-            $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
+            $query  = new Query($filter, $options);
+            $cursor = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
             foreach ($cursor as $document) {
-                $result[] = (array)$document;
+                $result[] = (array) $document;
             }
         } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $result;
@@ -235,42 +228,48 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 返回分页数据，默认每页10条
      *
-     * @param string $namespace
-     * @param int $limit
-     * @param int $currentPage
-     * @param array $filter
-     * @param array $options
+     * @param  string  $namespace
+     * @param  int  $limit
+     * @param  int  $currentPage
+     * @param  array  $filter
+     * @param  array  $options
      * @return array
      * @throws MongoDBException
      */
-    public function execFindPagination(string $namespace, int $limit = 10, int $currentPage = 0, array $filter = [], array $options = [])
-    {
+    public function execFindPagination(
+        string $namespace,
+        int $limit = 10,
+        int $currentPage = 0,
+        array $filter = [],
+        array $options = []
+    ) {
         // 查询数据
-        $data = [];
+        $data   = [];
         $result = [];
         //每次最多返回10条记录
-        if (!isset($options['limit']) || (int)$options['limit'] <= 0) {
+        if (!isset($options['limit']) || (int) $options['limit'] <= 0) {
             $options['limit'] = $limit;
         }
-        if (!isset($options['skip']) || (int)$options['skip'] <= 0) {
+        if (!isset($options['skip']) || (int) $options['skip'] <= 0) {
             $options['skip'] = $currentPage * $limit;
         }
+
         try {
-            $query = new Query($filter, $options);
-            $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
+            $query  = new Query($filter, $options);
+            $cursor = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
             foreach ($cursor as $document) {
-                $document = (array)$document;
-                $document['_id'] = (string)$document['_id'];
-                $data[] = $document;
+                $document        = (array) $document;
+                $document['_id'] = (string) $document['_id'];
+                $data[]          = $document;
             }
-            $result['totalCount'] = $this->count($namespace, $filter);
+            $result['totalCount']  = $this->execCount($namespace, $filter);
             $result['currentPage'] = $currentPage;
-            $result['perPage'] = $limit;
-            $result['list'] = $data;
+            $result['perPage']     = $limit;
+            $result['list']        = $data;
         } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $result;
@@ -280,9 +279,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 查询返回结果的一条数据（_id自动转对象）
      *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $options
+     * @param  string  $namespace
+     * @param  array  $filter
+     * @param  array  $options
      * @return array
      * @throws MongoDBException
      */
@@ -295,18 +294,18 @@ class MongodbConnection extends Connection implements ConnectionInterface
         $result = [];
         try {
             $options['limit'] = 1;
-            $query = new Query($filter, $options);
-            $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
+            $query            = new Query($filter, $options);
+            $cursor           = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
             foreach ($cursor as $document) {
-                $document = (array)$document;
-                $document['_id'] = (string)$document['_id'];
-                $result = $document;
+                $document        = (array) $document;
+                $document['_id'] = (string) $document['_id'];
+                $result          = $document;
                 break;
             }
         } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $result;
@@ -316,9 +315,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 查询返回结果的全部数据（_id自动转对象）
      *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $options
+     * @param  string  $namespace
+     * @param  array  $filter
+     * @param  array  $options
      * @return array
      * @throws MongoDBException
      */
@@ -330,17 +329,17 @@ class MongodbConnection extends Connection implements ConnectionInterface
         // 查询数据
         $result = [];
         try {
-            $query = new Query($filter, $options);
-            $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
+            $query  = new Query($filter, $options);
+            $cursor = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
             foreach ($cursor as $document) {
-                $document = (array)$document;
-                $document['_id'] = (string)$document['_id'];
-                $result[] = $document;
+                $document        = (array) $document;
+                $document['_id'] = (string) $document['_id'];
+                $result[]        = $document;
             }
         } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $result;
@@ -350,45 +349,50 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 返回分页数据，默认每页10条（_id自动转对象）
      *
-     * @param string $namespace
-     * @param int $limit
-     * @param int $currentPage
-     * @param array $filter
-     * @param array $options
+     * @param  string  $namespace
+     * @param  int  $limit
+     * @param  int  $currentPage
+     * @param  array  $filter
+     * @param  array  $options
      * @return array
      * @throws MongoDBException
      */
-    public function execFindPaginationId(string $namespace, int $limit = 10, int $currentPage = 0, array $filter = [], array $options = [])
-    {
+    public function execFindPaginationId(
+        string $namespace,
+        int $limit = 10,
+        int $currentPage = 0,
+        array $filter = [],
+        array $options = []
+    ) {
         if (!empty($filter['_id']) && !($filter['_id'] instanceof ObjectId)) {
             $filter['_id'] = new ObjectId($filter['_id']);
         }
         // 查询数据
-        $data = [];
+        $data   = [];
         $result = [];
         //每次最多返回10条记录
-        if (!isset($options['limit']) || (int)$options['limit'] <= 0) {
+        if (!isset($options['limit']) || (int) $options['limit'] <= 0) {
             $options['limit'] = $limit;
         }
-        if (!isset($options['skip']) || (int)$options['skip'] <= 0) {
+        if (!isset($options['skip']) || (int) $options['skip'] <= 0) {
             $options['skip'] = $currentPage * $limit;
         }
         try {
-            $query = new Query($filter, $options);
-            $cursor = $this->connection->executeQuery($this->config['db'] . '.' . $namespace, $query);
+            $query  = new Query($filter, $options);
+            $cursor = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
             foreach ($cursor as $document) {
-                $document = (array)$document;
-                $document['_id'] = (string)$document['_id'];
-                $data[] = $document;
+                $document        = (array) $document;
+                $document['_id'] = (string) $document['_id'];
+                $data[]          = $document;
             }
-            $result['totalCount'] = $this->count($namespace, $filter);
+            $result['totalCount']  = $this->execCount($namespace, $filter);
             $result['currentPage'] = $currentPage;
-            $result['perPage'] = $limit;
-            $result['list'] = $data;
+            $result['perPage']     = $limit;
+            $result['list']        = $data;
         } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $result;
@@ -402,21 +406,21 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * $data2 = ['_id' => 'custom ID', 'title' => 'two'];
      * $data3 = ['_id' => new MongoDB\BSON\ObjectId, 'title' => 'three'];
      *
-     * @param string $namespace
-     * @param array $data
+     * @param  string  $namespace
+     * @param  array  $data
      * @return bool|string
      * @throws MongoDBException
      */
     public function execInsertOne(string $namespace, array $data = [])
     {
         try {
-            $bulk = new BulkWrite();
-            $insertId = (string)$bulk->insert($data);
-            $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
-            $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $bulk     = new BulkWrite();
+            $insertId = (string) $bulk->insert($data);
+            $written  = new WriteConcern(WriteConcern::MAJORITY, 1000);
+            $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
         } catch (\Exception $e) {
             $insertId = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $insertId;
@@ -432,8 +436,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * ['_id' => new MongoDB\BSON\ObjectId, 'title' => 'three']
      * ];
      *
-     * @param string $namespace
-     * @param array $data
+     * @param  string  $namespace
+     * @param  array  $data
      * @return bool|string
      * @throws MongoDBException
      */
@@ -442,13 +446,13 @@ class MongodbConnection extends Connection implements ConnectionInterface
         try {
             $bulk = new BulkWrite();
             foreach ($data as $items) {
-                $insertId[] = (string)$bulk->insert($items);
+                $insertId[] = (string) $bulk->insert($items);
             }
             $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
-            $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
         } catch (\Exception $e) {
             $insertId = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $insertId;
@@ -464,9 +468,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
      *   ['multi' => false, 'upsert' => false]
      * );
      *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $newObj
+     * @param  string  $namespace
+     * @param  array  $filter
+     * @param  array  $newObj
      * @return bool
      * @throws MongoDBException
      */
@@ -479,13 +483,13 @@ class MongodbConnection extends Connection implements ConnectionInterface
                 ['$set' => $newObj],
                 ['multi' => true, 'upsert' => false]
             );
-            $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
-            $result = $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $written       = new WriteConcern(WriteConcern::MAJORITY, 1000);
+            $result        = $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
             $modifiedCount = $result->getModifiedCount();
-            $update = $modifiedCount == 0 ? false : true;
+            $update        = $modifiedCount == 0 ? false : true;
         } catch (\Exception $e) {
             $update = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $update;
@@ -501,9 +505,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
      *   ['multi' => false, 'upsert' => false]
      * );
      *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $newObj
+     * @param  string  $namespace
+     * @param  array  $filter
+     * @param  array  $newObj
      * @return bool
      * @throws MongoDBException
      */
@@ -516,13 +520,13 @@ class MongodbConnection extends Connection implements ConnectionInterface
                 ['$set' => $newObj],
                 ['multi' => false, 'upsert' => false]
             );
-            $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
-            $result = $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $written       = new WriteConcern(WriteConcern::MAJORITY, 1000);
+            $result        = $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
             $modifiedCount = $result->getModifiedCount();
-            $update = $modifiedCount == 1 ? true : false;
+            $update        = $modifiedCount == 1 ? true : false;
         } catch (\Exception $e) {
             $update = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->release();
             return $update;
@@ -538,9 +542,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
      *   ['multi' => false, 'upsert' => false]
      * );
      *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $newObj
+     * @param  string  $namespace
+     * @param  array  $filter
+     * @param  array  $newObj
      * @return bool
      * @throws MongoDBException
      */
@@ -556,13 +560,13 @@ class MongodbConnection extends Connection implements ConnectionInterface
                 ['$set' => $newObj],
                 ['multi' => true, 'upsert' => false]
             );
-            $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
-            $result = $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $written       = new WriteConcern(WriteConcern::MAJORITY, 1000);
+            $result        = $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
             $modifiedCount = $result->getModifiedCount();
-            $update = $modifiedCount == 0 ? false : true;
+            $update        = $modifiedCount == 0 ? false : true;
         } catch (\Exception $e) {
             $update = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $update;
@@ -578,9 +582,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
      *   ['multi' => false, 'upsert' => false]
      * );
      *
-     * @param string $namespace
-     * @param array $filter
-     * @param array $newObj
+     * @param  string  $namespace
+     * @param  array  $filter
+     * @param  array  $newObj
      * @return bool
      * @throws MongoDBException
      */
@@ -596,13 +600,13 @@ class MongodbConnection extends Connection implements ConnectionInterface
                 ['$set' => $newObj],
                 ['multi' => false, 'upsert' => false]
             );
-            $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
-            $result = $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $written       = new WriteConcern(WriteConcern::MAJORITY, 1000);
+            $result        = $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
             $modifiedCount = $result->getModifiedCount();
-            $update = $modifiedCount == 1 ? true : false;
+            $update        = $modifiedCount == 1 ? true : false;
         } catch (\Exception $e) {
             $update = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->release();
             return $update;
@@ -612,8 +616,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 删除一条数据
      *
-     * @param string $namespace
-     * @param array $filter
+     * @param  string  $namespace
+     * @param  array  $filter
      * @return bool
      * @throws MongoDBException
      */
@@ -623,11 +627,11 @@ class MongodbConnection extends Connection implements ConnectionInterface
             $bulk = new BulkWrite;
             $bulk->delete($filter, ['limit' => 1]);
             $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
-            $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
             $delete = true;
         } catch (\Exception $e) {
             $delete = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $delete;
@@ -637,8 +641,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 删除多条数据
      *
-     * @param string $namespace
-     * @param array $filter
+     * @param  string  $namespace
+     * @param  array  $filter
      * @return bool
      * @throws MongoDBException
      */
@@ -648,11 +652,11 @@ class MongodbConnection extends Connection implements ConnectionInterface
             $bulk = new BulkWrite;
             $bulk->delete($filter, ['limit' => false]);
             $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
-            $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
             $delete = true;
         } catch (\Exception $e) {
             $delete = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $delete;
@@ -662,8 +666,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 删除一条数据（_id自动转对象）
      *
-     * @param string $namespace
-     * @param array $filter
+     * @param  string  $namespace
+     * @param  array  $filter
      * @return bool
      * @throws MongoDBException
      */
@@ -676,11 +680,11 @@ class MongodbConnection extends Connection implements ConnectionInterface
             $bulk = new BulkWrite;
             $bulk->delete($filter, ['limit' => 1]);
             $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
-            $this->connection->executeBulkWrite($this->config['db'] . '.' . $namespace, $bulk, $written);
+            $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
             $delete = true;
         } catch (\Exception $e) {
             $delete = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $delete;
@@ -690,8 +694,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 获取collection 中满足条件的条数
      *
-     * @param string $namespace
-     * @param array $filter
+     * @param  string  $namespace
+     * @param  array  $filter
      * @return bool
      * @throws MongoDBException
      */
@@ -702,15 +706,15 @@ class MongodbConnection extends Connection implements ConnectionInterface
                 'count' => $namespace,
                 'query' => $filter
             ]);
-            $cursor = $this->connection->executeCommand($this->config['db'], $command);
-            $count = $cursor->toArray()[0]->n;
+            $cursor  = $this->connection->executeCommand($this->config['db'], $command);
+            $count   = $cursor->toArray()[0]->n;
             return $count;
         } catch (\Exception $e) {
             $count = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
             $count = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $count;
@@ -720,8 +724,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 聚合查询
      *
-     * @param string $namespace
-     * @param array $filter
+     * @param  string  $namespace
+     * @param  array  $filter
      * @return bool
      * @throws Exception
      * @throws MongoDBException
@@ -731,14 +735,14 @@ class MongodbConnection extends Connection implements ConnectionInterface
         try {
             $command = new Command([
                 'aggregate' => $namespace,
-                'pipeline' => $filter,
-                'cursor' => new \stdClass()
+                'pipeline'  => $filter,
+                'cursor'    => new \stdClass()
             ]);
-            $cursor = $this->connection->executeCommand($this->config['db'], $command);
-            $count = $cursor->toArray()[0];
+            $cursor  = $this->connection->executeCommand($this->config['db'], $command);
+            $count   = $cursor->toArray()[0];
         } catch (\Exception $e) {
             $count = false;
-            throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
             return $count;
