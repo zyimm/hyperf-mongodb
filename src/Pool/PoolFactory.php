@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: adamchen1208
- * Date: 2020/7/24
- * Time: 15:28
- */
+
 
 namespace Hyperf\Mongodb\Pool;
 

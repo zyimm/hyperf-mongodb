@@ -1,14 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: adamchen1208
- * Date: 2020/7/24
- * Time: 15:29
- */
 
 namespace Hyperf\Mongodb;
 
-use Hyperf\Mongodb\Mongodb;
+!defined('BASE_PATH') && define('BASE_PATH', dirname(__DIR__, 1));
 
 class ConfigProvider
 {
@@ -18,19 +12,19 @@ class ConfigProvider
             'dependencies' => [
                 Mongodb::class => Mongodb::class,
             ],
-            'commands' => [
+            'commands'     => [
             ],
-            'scan' => [
+            'scan'         => [
                 'paths' => [
                     __DIR__,
                 ],
             ],
-            'publish' => [
+            'publish'      => [
                 [
-                    'id' => 'config',
+                    'id'          => 'config',
                     'description' => 'The config of mongodb client.',
-                    'source' => __DIR__ . '/../publish/mongodb.php',
-                    'destination' => BASE_PATH . '/config/autoload/mongodb.php',
+                    'source'      => __DIR__.'/../publish/mongodb.php',
+                    'destination' => BASE_PATH.'/config/autoload/mongodb.php',
                 ],
             ],
         ];

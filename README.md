@@ -1,18 +1,33 @@
 # hyperf-mongodb
 
 #### 介绍
-用于hyperf的mongodb连接池组件，暂不支持协程。基于composer项目yumufeng/hyperf-mongodb和项目mongodb/mongodb做了个性化的优化。
 
+用于hyperf的mongodb连接池组件，暂不支持协程。基于 (Adam/hyperf-mongodb)[https://gitee.com/adamchen1208/hyperf-mongodb?_from=gitee_search],
+改作者好像已经不更新了，且源代码有些bug，依赖也存在一些问题。
+1. 为此我clone该项目进行大幅度的修改，和原先项目变动较大，所以另起项目进行开源！
+2. 增加单元测试，优化依赖。
+3. 规范代码编写，简洁了源代码中一些不规范，重复高的代码。
 
 # hyperf mongodb pool
 
 ```
-composer require adamchen1208/hyperf-mongodb
+## step 1
+{
+  "repositories": [{
+    "type": "composer",
+    "url": "http://composer.zyimm.com"
+  }]
+}
+
+## step 2
+
+composer require zyimm/hyperf-mongodb
 ```
 
-## config 
-在/config/autoload目录里面创建文件 mongodb.php
-添加以下内容
+## config
+
+在/config/autoload目录里面创建文件 mongodb.php 添加以下内容
+
 ```php
 return [
     'default' => [
@@ -36,11 +51,11 @@ return [
 ];
 ```
 
-
 # 使用案例
 
-使用注解，自动加载 
-**\Hyperf\Mongodb\Mongodb** 
+使用注解，自动加载
+**\Hyperf\Mongodb\Mongodb**
+
 ```php
 /**
  * @Inject()
@@ -49,7 +64,8 @@ return [
  protected $mongodb;
 ```
 
-#### **tips:** 
+#### **tips:**
+
 查询的值，是严格区分类型，string、int类型的哦
 
 ### 查询一条数据
@@ -67,6 +83,7 @@ $result = $this->$mongodb->findAll('test', $where);
 ```
 
 ### 分页查询
+
 ```php
 $list = $this->$mongodb->findPagination('article', 10, 0, ['author' => $author]);
 ```
@@ -86,11 +103,13 @@ $result = $this->$mongodb->findAllId('test', $where);
 ```
 
 ### 分页查询（_id自动转对象）
+
 ```php
 $list = $this->$mongodb->findPaginationId('article', 10, 0, ['author' => $author]);
 ```
 
 ### 插入一条数据
+
 ```php
 $insert = [
             '_id' => '',
@@ -100,6 +119,7 @@ $this->$mongodb->insert('test',$insert);
 ```
 
 ### 插入批量数据
+
 ```php
 $insert = [
             [
@@ -115,6 +135,7 @@ $this->$mongodb->insertAll('test',$insert);
 ```
 
 ### 更新
+
 ```php
 $where = ['_id'=>'1112313423'];
 $updateData = [];
@@ -124,6 +145,7 @@ $this->$mongodb->updateRow('test',$where,$updateData);// 更新数据满足$wher
 ```
 
 ### 更新（_id自动转对象）
+
 ```php
 $where = ['_id'=>'1112313423'];
 $updateData = [];
@@ -133,6 +155,7 @@ $this->$mongodb->updateRowId('test',$where,$updateData);// 更新数据满足$wh
 ```
 
 ### 删除
+
 ```php
 $where = ['_id'=>'1112313423'];
 $all = true; // 为false只删除匹配的一条，true删除多条
@@ -140,6 +163,7 @@ $this->$mongodb->deleteOne('test',$where,$all);
 ```
 
 ### 批量删除
+
 ```php
 $where = ['_id'=>'1112313423'];
 $all = true; // 为false只删除匹配的一条，true删除多条
@@ -147,6 +171,7 @@ $this->$mongodb->deleteMany('test',$where,$all);
 ```
 
 ### 删除（_id自动转对象）
+
 ```php
 $where = ['_id'=>'1112313423'];
 $all = true; // 为false只删除匹配的一条，true删除多条
@@ -154,12 +179,14 @@ $this->$mongodb->deleteOneId('test',$where,$all);
 ```
 
 ### 统计
+
 ```php
 $filter = ['isGroup' => "0", 'wechat' => '15584044700'];
 $count = $this->$mongodb->count('test', $filter);
 ```
 
 ### 聚合查询
+
 **sql** 和 **mongodb** 关系对比图
 
 |   SQL  | MongoDb |
