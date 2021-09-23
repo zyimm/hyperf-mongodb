@@ -4,6 +4,7 @@
 namespace Hyperf\Mongodb\Pool;
 
 use Hyperf\Di\Container;
+use Hyperf\Di\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 use Swoole\Coroutine\Channel;
 
@@ -24,7 +25,10 @@ class PoolFactory
         $this->container = $container;
     }
 
-    public function getPool(string $name): MongoDBPool
+    /**
+     * @throws NotFoundException
+     */
+    public function getPool(string $name): Channel
     {
         if (isset($this->pools[$name])) {
             return $this->pools[$name];

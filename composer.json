@@ -9,9 +9,11 @@
   ],
   "require": {
     "php": ">=7.2",
+    "hyperf/framework": "~2.1.0",
     "psr/container": "^1.0",
     "hyperf/pool": "^2.0",
     "hyperf/utils": "^2.0.0",
+    "hyperf/di": "^2.0.0",
     "ext-mongodb": "*"
   },
   "require-dev": {

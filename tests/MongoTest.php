@@ -4,7 +4,7 @@ namespace Zyimm\Test;
 
 class MongoTest extends \PHPUnit\Framework\TestCase
 {
-    public function testfindALL()
+    public function testFindALL()
     {
         $this->assertArrayHasKey('error_code', Sdk::instance($this->config())
             ->service()
