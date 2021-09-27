@@ -16,9 +16,6 @@
     "hyperf/di": "^2.0.0",
     "ext-mongodb": "*"
   },
-  "require-dev": {
-    "phpunit/phpunit": "^9.5"
-  },
   "autoload": {
     "classmap": [
     ],
@@ -30,5 +27,8 @@
     "hyperf": {
       "config": "Hyperf\\Mongodb\\ConfigProvider"
     }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
   }
 }

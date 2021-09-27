@@ -2,13 +2,13 @@
 namespace Zyimm\Test;
 
 
-class MongoTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+
+class MongoTest extends TestCase
 {
     public function testFindALL()
-    {
-        $this->assertArrayHasKey('error_code', Sdk::instance($this->config())
-            ->service()
-            ->memberInfo()->getMemberList());
-
+    {    
+        $this->assertArrayHasKey('error_code', []);
     }
 }
