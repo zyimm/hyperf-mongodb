@@ -1,4 +1,5 @@
 <?php
+
 namespace Hyperf\Mongodb;
 
 use Hyperf\Contract\ConnectionInterface;
@@ -270,10 +271,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
-        } finally {
-            $this->pool->release($this);
-            return $result;
         }
+        return $result;
     }
 
     /**
@@ -306,10 +305,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
-        } finally {
-            $this->pool->release($this);
-            return $result;
         }
+        return $result;
     }
 
     /**
@@ -340,10 +337,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
-        } finally {
-            $this->pool->release($this);
-            return $result;
         }
+        return $result;
     }
 
     /**
@@ -393,10 +388,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
-        } finally {
-            $this->pool->release($this);
-            return $result;
         }
+        return $result;
     }
 
     /**
