@@ -8,6 +8,7 @@
 
 namespace Hyperf\Mongodb;
 
+use Exception;
 use Hyperf\Mongodb\Exception\MongoDBException;
 use Hyperf\Mongodb\Pool\PoolFactory;
 use Hyperf\Utils\Context;
@@ -41,7 +42,7 @@ class Mongodb
         return sprintf('mongodb.connection.%s', $this->poolName);
     }
 
-    private function getConnection()
+    private function getConnection(): ?MongodbConnection
     {
         $connection = null;
         $hasContextConnection = Context::has($this->getContextKey());
@@ -72,7 +73,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execFindOne($namespace, $filter, $options);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -94,7 +95,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execFindAll($namespace, $filter, $options);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -118,7 +119,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execFindPagination($namespace, $limit, $currentPage, $filter, $options);
-        } catch (\Exception  $e) {
+        } catch (Exception  $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -140,7 +141,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execFindOneId($namespace, $filter, $options);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -162,7 +163,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execFindAllId($namespace, $filter, $options);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -186,7 +187,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execFindPaginationId($namespace, $limit, $currentPage, $filter, $options);
-        } catch (\Exception  $e) {
+        } catch (Exception  $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -207,7 +208,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execInsertOne($namespace, $data);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -252,7 +253,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execUpdateRow($namespace, $filter, $newObj);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -274,7 +275,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execUpdateColumn($namespace, $filter, $newObj);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -296,7 +297,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execUpdateRowId($namespace, $filter, $newObj);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -318,7 +319,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execUpdateColumnId($namespace, $filter, $newObj);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -339,7 +340,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execDeleteOne($namespace, $filter);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -360,7 +361,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execDeleteMany($namespace, $filter);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -381,7 +382,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execDeleteOneId($namespace, $filter);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -402,7 +403,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execCount($namespace, $filter);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }
@@ -423,7 +424,7 @@ class Mongodb
              */
             $collection = $this->getConnection();
             return $collection->execCommand($namespace, $filter);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MongoDBException($e->getFile() . $e->getLine() . $e->getMessage());
         }
     }

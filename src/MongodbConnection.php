@@ -697,7 +697,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
         try {
             $command = new Command([
                 'count' => $namespace,
-                'query' => $filter
+                'query' => empty($filter) ? (object)[]:$filter
             ]);
             $cursor  = $this->connection->executeCommand($this->config['db'], $command);
             $count   = $cursor->toArray()[0]->n;
@@ -723,7 +723,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * @throws Exception
      * @throws MongoDBException
      */
-    public function execCommand(string $namespace, array $filter = [])
+    public function execCommand(string $namespace, array $filter = []): bool
     {
         try {
             $command = new Command([
