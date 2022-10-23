@@ -205,7 +205,7 @@ class Mongodb
      * @return bool
      * @throws MongoDBException
      */
-    public function insertOne($namespace, array $data = [])
+    public function insertOne($namespace, array $data = []): bool
     {
         try {
             /**
@@ -220,12 +220,13 @@ class Mongodb
 
     /**
      * 插入批量数据
+     *
      * @param $namespace
      * @param  array  $data
-     * @return bool|string
+     * @return array
      * @throws MongoDBException
      */
-    public function insertMany($namespace, array $data)
+    public function insertMany($namespace, array $data): array
     {
         if (count($data) == count($data, 1)) {
             throw new  MongoDBException('data is can only be a two-dimensional array');
@@ -397,10 +398,10 @@ class Mongodb
      *
      * @param  string  $namespace
      * @param  array  $filter
-     * @return bool
+     * @return int
      * @throws MongoDBException
      */
-    public function count(string $namespace, array $filter = [])
+    public function count(string $namespace, array $filter = []): int
     {
         try {
             /**
@@ -421,7 +422,7 @@ class Mongodb
      * @throws MongoDBException
      * @throws Exception
      */
-    public function command(string $namespace, array $filter = [])
+    public function command(string $namespace, array $filter = []): bool
     {
         try {
             /**

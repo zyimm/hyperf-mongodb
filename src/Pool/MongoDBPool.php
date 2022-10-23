@@ -9,7 +9,9 @@ use Hyperf\Mongodb\MongodbConnection;
 use Hyperf\Pool\Pool;
 use Hyperf\Utils\Arr;
 use InvalidArgumentException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class MongoDBPool extends Pool
 {
@@ -23,6 +25,12 @@ class MongoDBPool extends Pool
      */
     protected $config;
 
+    /**
+     * @param  ContainerInterface  $container
+     * @param  string  $name
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function __construct(ContainerInterface $container, string $name)
     {
         $this->name = $name;

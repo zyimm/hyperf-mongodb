@@ -5,7 +5,9 @@ namespace Hyperf\Mongodb\Pool;
 
 use Hyperf\Di\Container;
 use Hyperf\Di\Exception\NotFoundException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Swoole\Coroutine\Channel;
 
 class PoolFactory
@@ -26,9 +28,15 @@ class PoolFactory
     }
 
     /**
+     * getPool
+     *
+     * @param  string  $name
+     * @return MongoDBPool|mixed|Channel
      * @throws NotFoundException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function getPool(string $name): Channel
+    public function getPool(string $name)
     {
         if (isset($this->pools[$name])) {
             return $this->pools[$name];
