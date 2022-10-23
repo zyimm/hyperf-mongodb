@@ -46,6 +46,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
 
     /**
      * Reconnect the connection.
+     *
      * @throws MongoDBException
      */
     public function reconnect(): bool
@@ -94,7 +95,6 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * getActiveConnection
      *
      * @throws ConnectionException
-     * @throws Exception
      * @throws MongoDBException
      */
     public function getActiveConnection(): MongodbConnection
@@ -113,7 +113,6 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * 判断当前的数据库连接是否已经超时
      *
      * @return bool
-     * @throws Exception
      * @throws MongoDBException
      */
     public function check(): bool
@@ -154,13 +153,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
                     break;
                 }
                 return true;
-
             case ($e instanceof RuntimeException):
-
                 throw new  MongoDBException('mongo runtime exception: '.$e->getMessage());
-
             default:
-
                 throw new  MongoDBException('mongo unexpected exception: '.$e->getMessage());
 
         }
@@ -184,7 +179,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * @return array
      * @throws MongoDBException
      */
-    public function execFindOne(string $namespace, array $filter = [], array $options = [])
+    public function execFindOne(string $namespace, array $filter = [], array $options = []): array
     {
         // 查询数据
         $result = [];
@@ -215,7 +210,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * @return array
      * @throws MongoDBException
      */
-    public function execFindAll(string $namespace, array $filter = [], array $options = [])
+    public function execFindAll(string $namespace, array $filter = [], array $options = []): array
     {
         // 查询数据
         $result = [];
@@ -252,7 +247,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
         int $currentPage = 0,
         array $filter = [],
         array $options = []
-    ) {
+    ): array {
         // 查询数据
         $data   = [];
         $result = [];
@@ -299,15 +294,13 @@ class MongodbConnection extends Connection implements ConnectionInterface
         try {
             $command = new Command([
                 'count' => $namespace,
-                'query' => $filter
+                'query' => empty($filter) ? (object)[]:$filter
             ]);
             $cursor  = $this->connection->executeCommand($this->config['db'], $command);
             return $cursor->toArray()[0]->n;
         } catch (\Exception $e) {
-            $count = 0;
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
-            $count = 0;
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
@@ -511,6 +504,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * );
      * </code>
      * </p>
+     *
      * @param  string  $namespace
      * @param  array  $filter
      * @param  array  $newObj
@@ -667,6 +661,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
      */
     public function execDeleteOne(string $namespace, array $filter = []): bool
     {
+        $delete = false;
         try {
             $bulk = new BulkWrite;
             $bulk->delete($filter, ['limit' => 1]);
@@ -674,7 +669,6 @@ class MongodbConnection extends Connection implements ConnectionInterface
             $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
             $delete = true;
         } catch (\Exception $e) {
-            $delete = false;
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } finally {
             $this->pool->release($this);
