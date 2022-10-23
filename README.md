@@ -2,8 +2,10 @@
 
 #### 介绍
 
-用于hyperf的mongodb连接池组件，暂不支持协程。基于 (Adam/hyperf-mongodb)[https://gitee.com/adamchen1208/hyperf-mongodb?_from=gitee_search],
+用于hyperf的mongodb连接池组件，暂不支持协程。基于 (
+Adam/hyperf-mongodb)[https://gitee.com/adamchen1208/hyperf-mongodb?_from=gitee_search],
 改作者好像已经不更新了，且源代码有些bug，依赖也存在一些问题。
+
 1. 为此我clone该项目进行大幅度的修改，和原先项目变动较大，所以另起项目进行开源！
 2. 增加单元测试，优化依赖。
 3. 规范代码编写，简洁了源代码中一些不规范，重复高的代码。
@@ -11,6 +13,7 @@
 # 使用
 
 ## 设置仓库源
+
 ```
 
 {
@@ -20,6 +23,7 @@
   }]
 }
 ```
+
 ## 安装
 
 ```
@@ -59,10 +63,13 @@ return [
 **\Hyperf\Mongodb\Mongodb**
 
 ```php
+
+use Hyperf\Di\Annotation\Inject;
 /**
  * @Inject()
  * @var Mongodb
 */
+
  protected $mongodb;
 ```
 
