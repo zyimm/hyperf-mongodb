@@ -3,10 +3,13 @@
 
 namespace Hyperf\Mongodb;
 
+use Hyperf\Di\Exception\NotFoundException;
 use Hyperf\Mongodb\Exception\MongoDBException;
 use Hyperf\Mongodb\Pool\PoolFactory;
 use Hyperf\Utils\Context;
 use MongoDB\Driver\Exception\Exception;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Class Mongodb
@@ -36,7 +39,9 @@ class Mongodb
      * @param  array  $filter
      * @param  array  $options
      * @return array
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function findOne(string $namespace, array $filter = [], array $options = []): array
     {
@@ -51,6 +56,14 @@ class Mongodb
         }
     }
 
+    /**
+     * getConnection
+     *
+     * @return false|MongodbConnection|mixed|null
+     * @throws NotFoundException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     private function getConnection()
     {
         $connection           = null;
@@ -80,7 +93,9 @@ class Mongodb
      * @param  array  $filter
      * @param  array  $options
      * @return array
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function findAll(string $namespace, array $filter = [], array $options = []): array
     {
@@ -104,7 +119,9 @@ class Mongodb
      * @param  array  $filter
      * @param  array  $options
      * @return array
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function findPagination(
         string $namespace,
@@ -131,7 +148,9 @@ class Mongodb
      * @param  array  $filter
      * @param  array  $options
      * @return array
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function findOneId(string $namespace, array $filter = [], array $options = []): array
     {
@@ -153,7 +172,9 @@ class Mongodb
      * @param  array  $filter
      * @param  array  $options
      * @return array
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function fetchAllId(string $namespace, array $filter = [], array $options = []): array
     {
@@ -177,7 +198,9 @@ class Mongodb
      * @param  array  $filter
      * @param  array  $options
      * @return array
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function findPaginationId(
         string $namespace,
@@ -203,7 +226,9 @@ class Mongodb
      * @param $namespace
      * @param  array  $data
      * @return bool
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function insertOne($namespace, array $data = []): bool
     {
@@ -224,7 +249,10 @@ class Mongodb
      * @param $namespace
      * @param  array  $data
      * @return array
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundException
+     * @throws NotFoundExceptionInterface
      */
     public function insertMany($namespace, array $data): array
     {
@@ -249,7 +277,9 @@ class Mongodb
      * @param  array  $filter
      * @param  array  $newObj
      * @return bool
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function updateRow($namespace, array $filter = [], array $newObj = []): bool
     {
@@ -271,7 +301,9 @@ class Mongodb
      * @param  array  $filter
      * @param  array  $newObj
      * @return bool
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function updateColumn($namespace, array $filter = [], array $newObj = []): bool
     {
@@ -293,7 +325,9 @@ class Mongodb
      * @param  array  $filter
      * @param  array  $newObj
      * @return bool
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function updateRowId($namespace, array $filter = [], array $newObj = []): bool
     {
@@ -315,7 +349,9 @@ class Mongodb
      * @param  array  $filter
      * @param  array  $newObj
      * @return bool
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function updateColumnId($namespace, array $filter = [], array $newObj = []): bool
     {
@@ -336,7 +372,9 @@ class Mongodb
      * @param  string  $namespace
      * @param  array  $filter
      * @return bool
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function deleteOne(string $namespace, array $filter = []): bool
     {
@@ -357,7 +395,9 @@ class Mongodb
      * @param  string  $namespace
      * @param  array  $filter
      * @return bool
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function deleteMany(string $namespace, array $filter = []): bool
     {
@@ -378,7 +418,9 @@ class Mongodb
      * @param  string  $namespace
      * @param  array  $filter
      * @return bool
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function deleteOneId(string $namespace, array $filter = []): bool
     {
@@ -399,7 +441,9 @@ class Mongodb
      * @param  string  $namespace
      * @param  array  $filter
      * @return int
+     * @throws ContainerExceptionInterface
      * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function count(string $namespace, array $filter = []): int
     {
@@ -416,11 +460,14 @@ class Mongodb
 
     /**
      * 聚合查询
+     *
      * @param  string  $namespace
      * @param  array  $filter
      * @return bool
-     * @throws MongoDBException
+     * @throws ContainerExceptionInterface
      * @throws Exception
+     * @throws MongoDBException
+     * @throws NotFoundExceptionInterface
      */
     public function command(string $namespace, array $filter = []): bool
     {
