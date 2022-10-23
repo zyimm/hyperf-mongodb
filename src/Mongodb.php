@@ -27,6 +27,11 @@ class Mongodb
      */
     protected $poolName = 'default';
 
+    /**
+     * Mongodb
+     *
+     * @param  PoolFactory  $factory
+     */
     public function __construct(PoolFactory $factory)
     {
         $this->factory = $factory;
@@ -79,6 +84,8 @@ class Mongodb
     }
 
     /**
+     * getContextKey
+     *
      * The key to identify the connection object in coroutine context.
      */
     private function getContextKey(): string

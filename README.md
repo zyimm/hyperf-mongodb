@@ -8,19 +8,21 @@
 2. 增加单元测试，优化依赖。
 3. 规范代码编写，简洁了源代码中一些不规范，重复高的代码。
 
-# hyperf mongodb pool
+# 使用
 
+## 设置仓库源
 ```
-## step 1
+
 {
   "repositories": [{
     "type": "composer",
     "url": "http://composer.zyimm.com"
   }]
 }
+```
+## 安装
 
-## step 2
-
+```
 composer require zyimm/hyperf-mongodb
 ```
 
