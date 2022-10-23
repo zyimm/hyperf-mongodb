@@ -47,15 +47,12 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * Reconnect the connection.
      *
+     * @see http://php.net/manual/zh/mongodb-driver-manager.construct.php
      * @throws MongoDBException
      */
     public function reconnect(): bool
     {
         try {
-            /**
-             * http://php.net/manual/zh/mongodb-driver-manager.construct.php
-             */
-
             $username = $this->config['username'];
             $password = $this->config['password'];
             if (!empty($username) && !empty($password)) {
@@ -249,8 +246,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
         array $options = []
     ): array {
         // 查询数据
-        $data   = [];
-        $result = [];
+        $data = $result = [];
         //每次最多返回10条记录
         if (!isset($options['limit']) || (int) $options['limit'] <= 0) {
             $options['limit'] = $limit;
@@ -294,7 +290,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
         try {
             $command = new Command([
                 'count' => $namespace,
-                'query' => empty($filter) ? (object)[]:$filter
+                'query' => empty($filter) ? (object) [] : $filter
             ]);
             $cursor  = $this->connection->executeCommand($this->config['db'], $command);
             return $cursor->toArray()[0]->n;
