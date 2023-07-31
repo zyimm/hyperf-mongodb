@@ -248,32 +248,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
         // 查询数据
         $data = $result = [];
         //每次最多返回10条记录
-        if (!isset($options['limit']) || (int) $options['limit'] <= 0) {
-            $options['limit'] = $limit;
-        }
-        if (!isset($options['skip']) || (int) $options['skip'] <= 0) {
-            $options['skip'] = $currentPage * $limit;
-        }
-        try {
-            $query  = new Query($filter, $options);
-            $cursor = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
-            foreach ($cursor as $document) {
-                $document        = (array) $document;
-                $document['_id'] = (string) $document['_id'];
-                $data[]          = $document;
-            }
-            $result['totalCount']  = $this->execCount($namespace, $filter);
-            $result['currentPage'] = $currentPage;
-            $result['perPage']     = $limit;
-            $result['list']        = $data;
-        } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
-        } catch (Exception $e) {
-            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
-        } finally {
-            $this->pool->release($this);
-            return $result;
-        }
+        return $this->limitTen($options, $limit, $currentPage, $filter, $namespace, $data, $result);
     }
 
     /**
@@ -357,13 +332,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
         // 查询数据
         $result = [];
         try {
-            $query  = new Query($filter, $options);
-            $cursor = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
-            foreach ($cursor as $document) {
-                $document        = (array) $document;
-                $document['_id'] = (string) $document['_id'];
-                $result[]        = $document;
-            }
+            $result = $this->getArr($filter, $options, $namespace, $result);
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
         } catch (Exception $e) {
@@ -399,32 +368,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
         $data   = [];
         $result = [];
         //每次最多返回10条记录
-        if (!isset($options['limit']) || (int) $options['limit'] <= 0) {
-            $options['limit'] = $limit;
-        }
-        if (!isset($options['skip']) || (int) $options['skip'] <= 0) {
-            $options['skip'] = $currentPage * $limit;
-        }
-        try {
-            $query  = new Query($filter, $options);
-            $cursor = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
-            foreach ($cursor as $document) {
-                $document        = (array) $document;
-                $document['_id'] = (string) $document['_id'];
-                $data[]          = $document;
-            }
-            $result['totalCount']  = $this->execCount($namespace, $filter);
-            $result['currentPage'] = $currentPage;
-            $result['perPage']     = $limit;
-            $result['list']        = $data;
-        } catch (\Exception $e) {
-            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
-        } catch (Exception $e) {
-            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
-        } finally {
-            $this->pool->release($this);
-            return $result;
-        }
+        return $this->limitTen($options, $limit, $currentPage, $filter, $namespace, $data, $result);
     }
 
     /**
@@ -750,6 +694,63 @@ class MongodbConnection extends Connection implements ConnectionInterface
         } finally {
             $this->pool->release($this);
             return $count;
+        }
+    }
+
+    /**
+     * @param array  $filter
+     * @param array  $options
+     * @param string $namespace
+     * @param array  $result
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getArr(array $filter, array $options, string $namespace, array $result): array
+    {
+        $query  = new Query($filter, $options);
+        $cursor = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
+        foreach ($cursor as $document) {
+            $document        = (array)$document;
+            $document['_id'] = (string)$document['_id'];
+            $result[]        = $document;
+        }
+        return $result;
+    }
+
+    /**
+     * @param array  $options
+     * @param int    $limit
+     * @param int    $currentPage
+     * @param array  $filter
+     * @param string $namespace
+     * @param array  $data
+     * @param array  $result
+     *
+     * @return array
+     * @throws MongoDBException
+     */
+    public function limitTen(array $options, int $limit, int $currentPage, array $filter, string $namespace, array $data, array $result): array
+    {
+        if (!isset($options['limit']) || (int)$options['limit'] <= 0) {
+            $options['limit'] = $limit;
+        }
+        if (!isset($options['skip']) || (int)$options['skip'] <= 0) {
+            $options['skip'] = $currentPage * $limit;
+        }
+        try {
+            $data                  = $this->getArr($filter, $options, $namespace, $data);
+            $result['totalCount']  = $this->execCount($namespace, $filter);
+            $result['currentPage'] = $currentPage;
+            $result['perPage']     = $limit;
+            $result['list']        = $data;
+        } catch (\Exception $e) {
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
+        } catch (Exception $e) {
+            throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
+        } finally {
+            $this->pool->release($this);
+            return $result;
         }
     }
 }

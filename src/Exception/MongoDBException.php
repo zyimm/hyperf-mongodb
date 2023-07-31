@@ -10,7 +10,8 @@ class MongoDBException extends Exception
 {
     public function __construct($message = "", $code = 0, Throwable $previous = null)
     {
-        $this->code = empty($code) ? __LINE__ : $code;
+        parent::__construct($message, $code, $previous);
+        $this->code    = empty($code) ? __LINE__ : $code;
         $this->message = $message;
     }
 
