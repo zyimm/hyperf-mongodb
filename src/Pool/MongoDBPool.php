@@ -18,12 +18,12 @@ class MongoDBPool extends Pool
     /**
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * @var array
      */
-    protected $config;
+    protected mixed $config;
 
     /**
      * @param  ContainerInterface  $container

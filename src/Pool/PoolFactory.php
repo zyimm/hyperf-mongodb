@@ -15,12 +15,12 @@ class PoolFactory
     /**
      * @var ContainerInterface
      */
-    protected $container;
+    protected ContainerInterface $container;
 
     /**
      * @var Channel[]
      */
-    protected $pools = [];
+    protected array $pools = [];
 
     public function __construct(ContainerInterface $container)
     {
@@ -36,7 +36,7 @@ class PoolFactory
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function getPool(string $name)
+    public function getPool(string $name): mixed
     {
         if (isset($this->pools[$name])) {
             return $this->pools[$name];

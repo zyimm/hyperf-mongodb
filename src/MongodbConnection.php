@@ -27,12 +27,12 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * @var Manager
      */
-    protected $connection;
+    protected Manager $connection;
 
     /**
      * @var array
      */
-    protected $config;
+    protected array $config;
 
     /**
      * @throws MongoDBException
@@ -124,7 +124,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
     }
 
     /**
-     * @param  Throwable  $e
+     * @param Throwable $e
+     *
      * @return bool
      * @throws MongoDBException
      */
@@ -170,9 +171,10 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 查询返回结果的一条数据
      *
-     * @param  string  $namespace
-     * @param  array  $filter
-     * @param  array  $options
+     * @param string $namespace
+     * @param array  $filter
+     * @param array  $options
+     *
      * @return array
      * @throws MongoDBException
      */
@@ -185,7 +187,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
             $query            = new Query($filter, $options);
             $cursor           = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
             foreach ($cursor as $document) {
-                $result = (array) $document;
+                $result = (array)$document;
                 break;
             }
         } catch (\Exception $e) {
@@ -201,9 +203,10 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 查询返回结果的全部数据
      *
-     * @param  string  $namespace
-     * @param  array  $filter
-     * @param  array  $options
+     * @param string $namespace
+     * @param array  $filter
+     * @param array  $options
+     *
      * @return array
      * @throws MongoDBException
      */
@@ -215,7 +218,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
             $query  = new Query($filter, $options);
             $cursor = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
             foreach ($cursor as $document) {
-                $result[] = (array) $document;
+                $result[] = (array)$document;
             }
         } catch (\Exception $e) {
             throw new MongoDBException($e->getFile().$e->getLine().$e->getMessage());
@@ -230,21 +233,23 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 返回分页数据，默认每页10条
      *
-     * @param  string  $namespace
-     * @param  int  $limit
-     * @param  int  $currentPage
-     * @param  array  $filter
-     * @param  array  $options
+     * @param string $namespace
+     * @param int    $limit
+     * @param int    $currentPage
+     * @param array  $filter
+     * @param array  $options
+     *
      * @return array
      * @throws MongoDBException
      */
     public function execFindPagination(
         string $namespace,
-        int $limit = 10,
-        int $currentPage = 0,
-        array $filter = [],
-        array $options = []
-    ): array {
+        int    $limit = 10,
+        int    $currentPage = 0,
+        array  $filter = [],
+        array  $options = []
+    ): array
+    {
         // 查询数据
         $data = $result = [];
         //每次最多返回10条记录
@@ -254,8 +259,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 获取collection 中满足条件的条数
      *
-     * @param  string  $namespace
-     * @param  array  $filter
+     * @param string $namespace
+     * @param array  $filter
+     *
      * @return int
      * @throws MongoDBException
      */
@@ -265,7 +271,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
         try {
             $command = new Command([
                 'count' => $namespace,
-                'query' => empty($filter) ? (object) [] : $filter
+                'query' => empty($filter) ? (object)[] : $filter
             ]);
             $cursor  = $this->connection->executeCommand($this->config['db'], $command);
             return $cursor->toArray()[0]->n;
@@ -282,9 +288,10 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 查询返回结果的一条数据（_id自动转对象）
      *
-     * @param  string  $namespace
-     * @param  array  $filter
-     * @param  array  $options
+     * @param string $namespace
+     * @param array  $filter
+     * @param array  $options
+     *
      * @return array
      * @throws MongoDBException
      */
@@ -300,8 +307,8 @@ class MongodbConnection extends Connection implements ConnectionInterface
             $query            = new Query($filter, $options);
             $cursor           = $this->connection->executeQuery($this->config['db'].'.'.$namespace, $query);
             foreach ($cursor as $document) {
-                $document        = (array) $document;
-                $document['_id'] = (string) $document['_id'];
+                $document        = (array)$document;
+                $document['_id'] = (string)$document['_id'];
                 $result          = $document;
                 break;
             }
@@ -318,9 +325,10 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 查询返回结果的全部数据（_id自动转对象）
      *
-     * @param  string  $namespace
-     * @param  array  $filter
-     * @param  array  $options
+     * @param string $namespace
+     * @param array  $filter
+     * @param array  $options
+     *
      * @return array
      * @throws MongoDBException
      */
@@ -346,21 +354,23 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 返回分页数据，默认每页10条（_id自动转对象）
      *
-     * @param  string  $namespace
-     * @param  int  $limit
-     * @param  int  $currentPage
-     * @param  array  $filter
-     * @param  array  $options
+     * @param string $namespace
+     * @param int    $limit
+     * @param int    $currentPage
+     * @param array  $filter
+     * @param array  $options
+     *
      * @return array
      * @throws MongoDBException
      */
     public function execFindPaginationId(
         string $namespace,
-        int $limit = 10,
-        int $currentPage = 0,
-        array $filter = [],
-        array $options = []
-    ): array {
+        int    $limit = 10,
+        int    $currentPage = 0,
+        array  $filter = [],
+        array  $options = []
+    ): array
+    {
         if (!empty($filter['_id']) && !($filter['_id'] instanceof ObjectId)) {
             $filter['_id'] = new ObjectId($filter['_id']);
         }
@@ -378,8 +388,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * $data2 = ['_id' => 'custom ID', 'title' => 'two'];
      * $data3 = ['_id' => new MongoDB\BSON\ObjectId, 'title' => 'three'];
      *
-     * @param  string  $namespace
-     * @param  array  $data
+     * @param string $namespace
+     * @param array  $data
+     *
      * @return string
      * @throws MongoDBException
      */
@@ -387,7 +398,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
     {
         try {
             $bulk     = new BulkWrite();
-            $insertId = (string) $bulk->insert($data);
+            $insertId = (string)$bulk->insert($data);
             $written  = new WriteConcern(WriteConcern::MAJORITY, 1000);
             $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
         } catch (\Exception $e) {
@@ -408,8 +419,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * ['_id' => new MongoDB\BSON\ObjectId, 'title' => 'three']
      * ];
      *
-     * @param  string  $namespace
-     * @param  array  $data
+     * @param string $namespace
+     * @param array  $data
+     *
      * @return array
      * @throws MongoDBException
      */
@@ -419,7 +431,7 @@ class MongodbConnection extends Connection implements ConnectionInterface
         try {
             $bulk = new BulkWrite();
             foreach ($data as $items) {
-                $insertId[] = (string) $bulk->insert($items);
+                $insertId[] = (string)$bulk->insert($items);
             }
             $written = new WriteConcern(WriteConcern::MAJORITY, 1000);
             $this->connection->executeBulkWrite($this->config['db'].'.'.$namespace, $bulk, $written);
@@ -445,9 +457,10 @@ class MongodbConnection extends Connection implements ConnectionInterface
      * </code>
      * </p>
      *
-     * @param  string  $namespace
-     * @param  array  $filter
-     * @param  array  $newObj
+     * @param string $namespace
+     * @param array  $filter
+     * @param array  $newObj
+     *
      * @return bool
      * @throws MongoDBException
      */
@@ -482,9 +495,10 @@ class MongodbConnection extends Connection implements ConnectionInterface
      *   ['multi' => false, 'upsert' => false]
      * );
      *
-     * @param  string  $namespace
-     * @param  array  $filter
-     * @param  array  $newObj
+     * @param string $namespace
+     * @param array  $filter
+     * @param array  $newObj
+     *
      * @return bool
      * @throws MongoDBException
      */
@@ -519,9 +533,10 @@ class MongodbConnection extends Connection implements ConnectionInterface
      *   ['multi' => false, 'upsert' => false]
      * );
      *
-     * @param  string  $namespace
-     * @param  array  $filter
-     * @param  array  $newObj
+     * @param string $namespace
+     * @param array  $filter
+     * @param array  $newObj
+     *
      * @return bool
      * @throws MongoDBException
      */
@@ -560,9 +575,10 @@ class MongodbConnection extends Connection implements ConnectionInterface
      *   ['multi' => false, 'upsert' => false]
      * );
      *
-     * @param  string  $namespace
-     * @param  array  $filter
-     * @param  array  $newObj
+     * @param string $namespace
+     * @param array  $filter
+     * @param array  $newObj
+     *
      * @return bool
      * @throws MongoDBException
      */
@@ -594,8 +610,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 删除一条数据
      *
-     * @param  string  $namespace
-     * @param  array  $filter
+     * @param string $namespace
+     * @param array  $filter
+     *
      * @return bool
      * @throws MongoDBException
      */
@@ -619,8 +636,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 删除多条数据
      *
-     * @param  string  $namespace
-     * @param  array  $filter
+     * @param string $namespace
+     * @param array  $filter
+     *
      * @return bool
      * @throws MongoDBException
      */
@@ -644,8 +662,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 删除一条数据（_id自动转对象）
      *
-     * @param  string  $namespace
-     * @param  array  $filter
+     * @param string $namespace
+     * @param array  $filter
+     *
      * @return bool
      * @throws MongoDBException
      */
@@ -672,8 +691,9 @@ class MongodbConnection extends Connection implements ConnectionInterface
     /**
      * 聚合查询
      *
-     * @param  string  $namespace
-     * @param  array  $filter
+     * @param string $namespace
+     * @param array  $filter
+     *
      * @return bool
      * @throws Exception
      * @throws MongoDBException
